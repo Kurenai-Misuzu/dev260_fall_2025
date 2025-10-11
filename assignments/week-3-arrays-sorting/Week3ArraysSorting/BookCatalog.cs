@@ -96,7 +96,7 @@ namespace Week3ArraysSorting
         /// </summary>
         public void StartLookupSession()
         {
-            Console.Clear();
+            //Console.Clear();
             Console.WriteLine("=== BOOK CATALOG LOOKUP (Part B) ===");
             Console.WriteLine();
             
@@ -231,20 +231,50 @@ namespace Week3ArraysSorting
         /// </summary>
         private void SortBooksRecursively()
         {
-            Console.WriteLine("TODO: Implement recursive sorting algorithm");
-            Console.WriteLine("Choose ONE to implement:");
-            Console.WriteLine("1. QuickSort - Choose pivot strategy and document it");
-            Console.WriteLine("2. MergeSort - Implement recursive split/merge");
-            Console.WriteLine();
-            Console.WriteLine("Requirements:");
-            Console.WriteLine("- Must be YOUR recursive implementation");
-            Console.WriteLine("- Cannot use Array.Sort() or LINQ");
-            Console.WriteLine("- Sort both arrays in parallel (original and normalized)");
-            Console.WriteLine("- Document Big-O time/space complexity in README");
-            
+            // Console.WriteLine("TODO: Implement recursive sorting algorithm");
+            // Console.WriteLine("Choose ONE to implement:");
+            // Console.WriteLine("1. QuickSort - Choose pivot strategy and document it");
+            // Console.WriteLine("2. MergeSort - Implement recursive split/merge");
+            // Console.WriteLine();
+            // Console.WriteLine("Requirements:");
+            // Console.WriteLine("- Must be YOUR recursive implementation");
+            // Console.WriteLine("- Cannot use Array.Sort() or LINQ");
+            // Console.WriteLine("- Sort both arrays in parallel (original and normalized)");
+            // Console.WriteLine("- Document Big-O time/space complexity in README");
+
             // TODO: Call your chosen sorting algorithm
             // Example: QuickSort(normalizedTitles, originalTitles, 0, bookCount - 1);
             // Example: MergeSort(normalizedTitles, originalTitles, 0, bookCount - 1);
+
+            // Console.WriteLine("NORMALIZED---------------------------------------------");
+            // Console.WriteLine("NORMALIZED COUNT: " + normalizedTitles.Count());
+            // foreach (var item in normalizedTitles)
+            // {
+            //     Console.WriteLine(item.ToString());
+            // }
+            // Console.WriteLine("ORIGINAL--------------------------------------------------");
+            // Console.WriteLine("ORIGINAL COUNT: " + originalTitles.Count());
+            // foreach (var item in originalTitles)
+            // {
+            //     Console.WriteLine(item.ToString());
+            // }
+
+            QuickSort(normalizedTitles, originalTitles, 0, bookCount - 1);
+
+            // Console.WriteLine("NORMALIZED---------------------------------------------");
+            // Console.WriteLine("NORMALIZED COUNT: " + normalizedTitles.Count());
+            // foreach (var item in normalizedTitles)
+            // {
+            //     Console.WriteLine(item.ToString());
+            // }
+            // Console.WriteLine("ORIGINAL--------------------------------------------------");
+            // Console.WriteLine("ORIGINAL COUNT: " + originalTitles.Count());
+            // foreach (var item in originalTitles)
+            // {
+            //     Console.WriteLine(item.ToString());
+            // }
+
+            
         }
         
         /// <summary>
@@ -312,21 +342,28 @@ namespace Week3ArraysSorting
             Console.WriteLine();
             Console.WriteLine($"Catalog contains {bookCount} books, sorted and indexed for fast lookup.");
         }
-        
+
         // TODO: Add your sorting algorithm methods
         // Choose ONE to implement:
-        
+
         /// <summary>
         /// QuickSort implementation (Option 1)
         /// TODO: Implement if you choose QuickSort
         /// </summary>
-        // private void QuickSort(string[] normalizedArray, string[] originalArray, int low, int high)
-        // {
-        //     // TODO: Implement recursive QuickSort
-        //     // TODO: Choose and document pivot strategy
-        //     // TODO: Ensure both arrays stay synchronized
-        // }
-        
+        private void QuickSort(string[] normalizedArray, string[] originalArray, int low, int high)
+        {
+            // TODO: Implement recursive QuickSort
+            // TODO: Choose and document pivot strategy
+            // TODO: Ensure both arrays stay synchronized
+            if (low < high){
+                int pi = Partition(normalizedArray, originalArray, low, high);
+                
+                QuickSort(normalizedArray, originalArray, low, pi - 1);
+                QuickSort(normalizedArray, originalArray, pi + 1, high);
+
+            }
+        }
+
         /// <summary>
         /// MergeSort implementation (Option 2)  
         /// TODO: Implement if you choose MergeSort
@@ -337,7 +374,7 @@ namespace Week3ArraysSorting
         //     // TODO: Handle O(n) extra space requirement
         //     // TODO: Ensure both arrays stay synchronized
         // }
-        
+
         // TODO: Add helper methods as needed
         // Examples:
         // - GetLetterIndex(char letter) - Convert A-Z to 0-25
@@ -345,5 +382,33 @@ namespace Week3ArraysSorting
         // - FindSuggestions(string query, int maxSuggestions)
         // - SwapElements(int index1, int index2) - For QuickSort
         // - MergeArrays(...) - For MergeSort
+
+        private int Partition(string[] normalizedArray, string[] originalArray, int low, int high)
+        {
+            string pivot = normalizedArray[high];
+            int i = low - 1;
+            for (int j = low; j < high; j++)
+            {
+                if (string.Compare(normalizedArray[j], pivot) < 0)
+                {
+                    i++;
+                    Swap(normalizedArray, originalArray, i, j);
+                }
+            }
+            Swap(normalizedArray, originalArray, i + 1, high);
+
+            return i + 1;
+        }
+        
+        private void Swap(string[] normalizedArray, string[] originalArray, int i, int j)
+        {
+            string tempNormalized = normalizedArray[i];
+            normalizedArray[i] = normalizedArray[j];
+            normalizedArray[j] = tempNormalized;
+
+            string tempOriginal = originalArray[i];
+            originalArray[i] = originalArray[j];
+            originalArray[j] = tempOriginal;
+        }
     }
 }
