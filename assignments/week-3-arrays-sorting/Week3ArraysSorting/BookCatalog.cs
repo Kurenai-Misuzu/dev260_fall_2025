@@ -322,6 +322,7 @@ namespace Week3ArraysSorting
             int secondChar = 0;
             for (int i = 0; i < normalizedTitles.Count(); i++)
             {
+                // obtain the first 2 chars from book array
                 firstChar = (int)normalizedTitles[i][0];
                 secondChar = (int)normalizedTitles[i][1];
 
@@ -374,18 +375,23 @@ namespace Week3ArraysSorting
             // TODO: If range exists, binary search for exact match
             // TODO: Display results using original titles
 
+            // take first and second character from query
             int firstChar = (int)query.ToUpper()[0];
+            // if there is no second character assume it's 'A'
             int secondChar = (query.Length > 1) ? (int)query.ToUpper()[1] : 65;
 
+            // convert ascii to index.
             firstChar = (firstChar >= 65 && firstChar <= 90) ? firstChar - 65 : 26;
             secondChar = (secondChar >= 65 && secondChar <= 90) ? secondChar - 65 : 26;
 
+            // get the index range of book array from query characters
             int rangeLow = startIndex[firstChar, secondChar];
             int rangeHigh = endIndex[firstChar, secondChar];
 
-            // if index is empty
+            // if index is empty (-1)
             if (startIndex[firstChar, secondChar] == -1)
             {
+                // iRunCount and jRunCount are here so tha that it makes sure it only goes through the array 26 times.
                 int iRunCount = 0;
                 int jRunCount = 0;
                 bool validSlice = false;
@@ -396,11 +402,12 @@ namespace Week3ArraysSorting
                 while (iRunCount < 26 && validSlice == false)
                 {
                     jRunCount = 0;
-                    while (jRunCount < 26)
+                    while (jRunCount < 26 && validSlice == false)
                     {
+                        // check if valid slice
                         if (startIndex[firstChar + i, secondChar + j] != -1)
                         {
-
+                            // set validIndex to the valid slice, end loop
                             validIndex = startIndex[firstChar + i, secondChar + j];
                             validSlice = true;
                         }
@@ -413,9 +420,12 @@ namespace Week3ArraysSorting
                     iRunCount++;
                 }
 
+                // print suggestions
                 int suggestionCount = 0;
                 Console.WriteLine("Not found! Suggestions: ");
-                while (suggestionCount < 5)
+
+                // returns 5 suggestions or however many books there are if there are less than 5 books
+                while (suggestionCount < Math.Min(5, bookCount))
                 {
                     if (validIndex >= bookCount)
                     {
@@ -520,18 +530,28 @@ namespace Week3ArraysSorting
 
         private int Partition(string[] normalizedArray, string[] originalArray, int low, int high)
         {
+            // this sort function used a end pivot strategy but this changes it to middle pivot strategy
+            int mid = low + (high - low) / 2;
+            Swap(normalizedArray, originalArray, mid, high);
+
+            // set pivot to end of array
             string pivot = normalizedArray[high];
+
+            // set i to 1 before low
             int i = low - 1;
             for (int j = low; j < high; j++)
             {
+                // check if string is less than pivot string (string compare checks alphabetically)
                 if (string.Compare(normalizedArray[j], pivot) < 0)
                 {
+                    // swaps
                     i++;
                     Swap(normalizedArray, originalArray, i, j);
                 }
             }
             Swap(normalizedArray, originalArray, i + 1, high);
 
+            // return new pivot index
             return i + 1;
         }
         
