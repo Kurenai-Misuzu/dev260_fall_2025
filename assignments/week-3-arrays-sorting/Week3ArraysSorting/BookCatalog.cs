@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 
 namespace Week3ArraysSorting
@@ -96,7 +97,7 @@ namespace Week3ArraysSorting
         /// </summary>
         public void StartLookupSession()
         {
-            //Console.Clear();
+            Console.Clear();
             Console.WriteLine("=== BOOK CATALOG LOOKUP (Part B) ===");
             Console.WriteLine();
             
@@ -273,6 +274,7 @@ namespace Week3ArraysSorting
             // {
             //     Console.WriteLine(item.ToString());
             // }
+            
 
             
         }
@@ -283,13 +285,13 @@ namespace Week3ArraysSorting
         /// </summary>
         private void BuildMultiDimensionalIndex()
         {
-            Console.WriteLine("TODO: Build multi-dimensional index");
-            Console.WriteLine("Requirements:");
-            Console.WriteLine("- Create int[,] startIndex and int[,] endIndex arrays (26x26)");
-            Console.WriteLine("- Map A-Z to indices 0-25");
-            Console.WriteLine("- Handle non-letter starts (map to index 0 or create 27th bucket)");
-            Console.WriteLine("- Scan sorted array once to record [start,end) ranges");
-            Console.WriteLine("- Empty ranges should have start > end or start = -1");
+            // Console.WriteLine("TODO: Build multi-dimensional index");
+            // Console.WriteLine("Requirements:");
+            // Console.WriteLine("- Create int[,] startIndex and int[,] endIndex arrays (26x26)");
+            // Console.WriteLine("- Map A-Z to indices 0-25");
+            // Console.WriteLine("- Handle non-letter starts (map to index 0 or create 27th bucket)");
+            // Console.WriteLine("- Scan sorted array once to record [start,end) ranges");
+            // Console.WriteLine("- Empty ranges should have start > end or start = -1");
             
             // TODO: Initialize index arrays
             // TODO: Scan sorted titles and record boundaries for each letter pair
@@ -300,6 +302,51 @@ namespace Week3ArraysSorting
             // {
             //     // Get first two letters and update index ranges
             // }
+
+            // initialize arrays
+            startIndex = new int[27, 27];
+            endIndex = new int[27, 27];
+
+            // fill with -1
+            for (int i = 0; i < 27; i++)
+            {
+                for (int j = 0; j < 27; j++)
+                {
+                    startIndex[i, j] = -1;
+                    endIndex[i, j] = -1;
+                }
+            }
+
+            // scan sorted array and build ranges
+            int firstChar = 0;
+            int secondChar = 0;
+            for (int i = 0; i < normalizedTitles.Count(); i++)
+            {
+                firstChar = (int)normalizedTitles[i][0];
+                secondChar = (int)normalizedTitles[i][1];
+
+                // A = 65
+                // Z = 90
+                // 0 = 48
+                // 9 = 57
+
+                // convert ascii to index.
+                firstChar = (firstChar >= 65 && firstChar <= 90) ? firstChar - 65 : 26;
+                secondChar = (secondChar >= 65 && secondChar <= 90) ? secondChar - 65 : 26;
+
+                // put stuff in places
+                // if it's empty
+                if (startIndex[firstChar, secondChar] == -1)
+                {
+                    startIndex[firstChar, secondChar] = i;
+                    endIndex[firstChar, secondChar] = i + 1;
+
+                // if it's not empty
+                } else
+                {
+                    endIndex[firstChar, secondChar] += 1;
+                }
+            }
         }
         
         /// <summary>
@@ -311,21 +358,109 @@ namespace Week3ArraysSorting
         {
             // TODO: Normalize query same way as indexing
             string normalizedQuery = NormalizeTitle(query);
-            
-            Console.WriteLine($"TODO: Perform lookup for '{query}'");
-            Console.WriteLine("Requirements:");
-            Console.WriteLine("1. Get first 1-2 letters of normalized query");
-            Console.WriteLine("2. Look up [start,end) range from 2D index in O(1)");
-            Console.WriteLine("3. If empty range, show suggestions from nearby ranges");
-            Console.WriteLine("4. If non-empty range, binary search within slice");
-            Console.WriteLine("5. Show exact match or helpful suggestions");
-            Console.WriteLine("6. Always display original titles (not normalized)");
-            
+
+            // Console.WriteLine($"TODO: Perform lookup for '{query}'");
+            // Console.WriteLine("Requirements:");
+            // Console.WriteLine("1. Get first 1-2 letters of normalized query");
+            // Console.WriteLine("2. Look up [start,end) range from 2D index in O(1)");
+            // Console.WriteLine("3. If empty range, show suggestions from nearby ranges");
+            // Console.WriteLine("4. If non-empty range, binary search within slice");
+            // Console.WriteLine("5. Show exact match or helpful suggestions");
+            // Console.WriteLine("6. Always display original titles (not normalized)");
+
             // TODO: Extract first two letters for indexing
             // TODO: Get start/end range from 2D index
             // TODO: If range is empty, find suggestions
             // TODO: If range exists, binary search for exact match
             // TODO: Display results using original titles
+
+            int firstChar = (int)query.ToUpper()[0];
+            int secondChar = (query.Length > 1) ? (int)query.ToUpper()[1] : 65;
+
+            firstChar = (firstChar >= 65 && firstChar <= 90) ? firstChar - 65 : 26;
+            secondChar = (secondChar >= 65 && secondChar <= 90) ? secondChar - 65 : 26;
+
+            int rangeLow = startIndex[firstChar, secondChar];
+            int rangeHigh = endIndex[firstChar, secondChar];
+
+            // if index is empty
+            if (startIndex[firstChar, secondChar] == -1)
+            {
+                int iRunCount = 0;
+                int jRunCount = 0;
+                bool validSlice = false;
+                int i = 0;
+                int j = 0;
+                int validIndex = 0;
+                // run through array to find a valid slice
+                while (iRunCount < 26 && validSlice == false)
+                {
+                    jRunCount = 0;
+                    while (jRunCount < 26)
+                    {
+                        if (startIndex[firstChar + i, secondChar + j] != -1)
+                        {
+
+                            validIndex = startIndex[firstChar + i, secondChar + j];
+                            validSlice = true;
+                        }
+                        j++;
+                        j = (secondChar + j > 26) ? j - 26 : j;
+                        jRunCount++;
+                    }
+                    i++;
+                    i = (firstChar + i > 26) ? i - 26 : i;
+                    iRunCount++;
+                }
+
+                int suggestionCount = 0;
+                Console.WriteLine("Not found! Suggestions: ");
+                while (suggestionCount < 5)
+                {
+                    if (validIndex >= bookCount)
+                    {
+                        validIndex -= bookCount;
+                    }
+                    Console.WriteLine(originalTitles[validIndex]);
+                    suggestionCount++;
+                    validIndex++;
+                }
+            }
+            // if index is not empty
+            else
+            {
+                // fill new array for binary search
+                int newArrayCount = rangeHigh - rangeLow;
+                string[] smallArray = new string[newArrayCount];
+                int j = 0;
+                for (int i = rangeLow; i < rangeHigh; i++)
+                {
+                    smallArray[j] = normalizedTitles[i];
+                    j++;
+                }
+
+                //binary search
+                int binarySearchResult = 0;
+                binarySearchResult = Array.BinarySearch(smallArray, query.ToUpper());
+
+                // if exact match not found, give suggestions within same slice
+                if (binarySearchResult < 0)
+                {
+                    Console.WriteLine("Exact match not found! Suggestions: ");
+                    for (int i = rangeLow; i < rangeHigh; i++)
+                    {
+                        Console.WriteLine(originalTitles[i]);
+                    }
+                }
+                // exact match found
+                else
+                {
+                    Console.WriteLine("FOUND: ");
+                    Console.WriteLine(originalTitles[binarySearchResult + rangeLow]);
+                }
+            }
+
+            
         }
         
         /// <summary>

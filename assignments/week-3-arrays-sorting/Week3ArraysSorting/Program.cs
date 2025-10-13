@@ -117,8 +117,8 @@ namespace Week3ArraysSorting
                 string bookFilePath = "books.txt"; // Default
                 
                 Console.WriteLine("Starting Book Catalog...");
-                Console.WriteLine($"TODO: Load books from {bookFilePath}");
-                Console.WriteLine("TODO: Implement book catalog integration here");
+                // Console.WriteLine($"TODO: Load books from {bookFilePath}");
+                // Console.WriteLine("TODO: Implement book catalog integration here");
                 
                 // TODO: Create and start your book catalog
                 BookCatalog catalog = new BookCatalog();

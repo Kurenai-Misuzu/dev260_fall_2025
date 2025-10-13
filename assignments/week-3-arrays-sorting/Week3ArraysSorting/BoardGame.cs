@@ -231,7 +231,12 @@ namespace Week3ArraysSorting
             while (!validMove){
 
                 Console.WriteLine($"Player {currentPlayer}, enter your move row + column. (Ex. A3, B1, C2): ");
-                string input = Console.ReadLine();
+                string? input = Console.ReadLine();
+                if (input == null || input == "")
+                {
+                    Console.WriteLine("Please input a move!");
+                    continue;
+                }
                 char rowChar = input[0];
                 char colChar = input[1];
 
@@ -344,8 +349,8 @@ namespace Week3ArraysSorting
             bool validInput = false;
             while (!validInput){
                 Console.WriteLine("Play again? y/n");
-                string input = Console.ReadLine();
-                if (input.Length > 1){
+                string? input = Console.ReadLine();
+                if (input == null || input == "" || input.Length > 1){
                     Console.WriteLine("Please input a valid response.");
                     continue;
                 } else if (Char.ToUpper(input[0]) == 'Y'){
