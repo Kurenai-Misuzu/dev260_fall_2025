@@ -43,8 +43,11 @@ namespace StackLab
     {
 
         // TODO: Step 1 - Declare two stacks for action history and undo functionality
+        static Stack<string> actionHistory = new Stack<string>();
+        static Stack<string> undoFunctionality = new Stack<string>();
 
         // TODO: Step 2 - Add a counter for total operations
+        static int totalOperations = 0;
 
         static void Main(string[] args)
         {
@@ -112,7 +115,10 @@ namespace StackLab
             Console.WriteLine("│ 7. Redo      │ 8. Stats     │ 9. Exit        │");
             Console.WriteLine("└─────────────────────────────────────────────────┘");
             // TODO: Step 3 - add stack size and total operations to our display
+            Console.WriteLine($"Stack Size {actionHistory.Count}");
+            Console.WriteLine($"Total Operations: {totalOperations}");
             Console.Write("\nChoose operation (number or name): ");
+
         }
 
         // TODO: Step 4 - Implement HandlePush method
@@ -125,6 +131,20 @@ namespace StackLab
             // 4. Clear undoHistory stack (new action invalidates redo)
             // 5. Increment totalOperations
             // 6. Show confirmation message
+
+            String? input = null;
+            do
+            {
+                input = null;
+                Console.WriteLine("Type something to put in the stack!");
+                input = Console.ReadLine();
+            }
+            while (input == null);
+            actionHistory.Push(input);
+            undoFunctionality.Clear();
+            totalOperations++;
+            Console.WriteLine("Successfully pushed to stack!");
+
         }
 
         // TODO: Step 5 - Implement HandlePop method
@@ -139,6 +159,26 @@ namespace StackLab
             //    - Increment totalOperations
             //    - Show what was popped
             //    - Show new top item (if any)
+            if (actionHistory.Count > 0)
+            {
+                String popped = actionHistory.Pop();
+                undoFunctionality.Push(popped);
+                totalOperations++;
+                Console.WriteLine($"Popped: {popped}");
+                if (actionHistory.Count > 0)
+                {
+                    Console.WriteLine($"Top of stack: {actionHistory.Peek()}");
+                }
+                else
+                {
+                    Console.WriteLine("Empty Stack!");
+                }
+
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty!");
+            }
         }
 
         // TODO: Step 6 - Implement HandlePeek method
@@ -149,6 +189,15 @@ namespace StackLab
             // 2. If empty, show appropriate message
             // 3. If not empty, peek at top item and display
             // 4. Remember: Peek doesn't modify the stack!
+            if (actionHistory.Count > 0)
+            {
+                string peeked = actionHistory.Peek();
+                Console.WriteLine($"Top of stack: {peeked}");
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty!");
+            }
         }
 
         // TODO: Step 7 - Implement HandleDisplay method
@@ -161,6 +210,32 @@ namespace StackLab
             // 4. Show items in LIFO order with position numbers
             // 5. Mark the top item clearly
             // 6. Show total count
+
+            if (actionHistory.Count > 0)
+            {
+                Console.WriteLine("--------------------------------------");
+                Console.WriteLine("STACK INSIDE");
+                Console.WriteLine("--------------------------------------");
+
+                int counter = 0;
+                foreach (string i in actionHistory)
+                {
+                    Console.Write($"{counter}. {i}");
+                    counter++;
+                    if (String.Equals(i, actionHistory.Peek()))
+                    {
+                        Console.Write(" <- TOP OF STACK");
+                    }
+                    Console.WriteLine();
+                }
+                Console.WriteLine($"Total Count: {actionHistory.Count}");
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty!");
+            }
+
+           
         }
 
         // TODO: Step 8 - Implement HandleClear method
@@ -174,6 +249,20 @@ namespace StackLab
             //    - Clear both actionHistory and undoHistory
             //    - Increment totalOperations
             //    - Show confirmation with count cleared
+            if (actionHistory.Count > 0)
+            {
+                int countCleared = 0;
+                countCleared = actionHistory.Count;
+                actionHistory.Clear();
+                undoFunctionality.Clear();
+                totalOperations++;
+                Console.WriteLine("Stack cleared!");
+                Console.WriteLine($"Total cleared: {countCleared}");
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty!");
+            }
         }
 
         // TODO: Step 9 - Implement HandleUndo method (Advanced)
@@ -187,6 +276,17 @@ namespace StackLab
             //    - Push back to actionHistory
             //    - Increment totalOperations
             //    - Show what was restored
+            if (undoFunctionality.Count > 0)
+            {
+                string popped = undoFunctionality.Pop();
+                actionHistory.Push(popped);
+                totalOperations++;
+                Console.WriteLine($"Restored: {popped}");
+            } 
+            else
+            {
+                Console.WriteLine("Nothing to undo!");
+            }
         }
 
         // TODO: Step 10 - Implement HandleRedo method (Advanced)
@@ -200,6 +300,17 @@ namespace StackLab
             //    - Push to undoHistory
             //    - Increment totalOperations
             //    - Show what was redone
+            if (actionHistory.Count > 0)
+            {
+                string popped = actionHistory.Pop();
+                undoFunctionality.Push(popped);
+                totalOperations++;
+                Console.WriteLine($"Redo: {popped}");
+            }
+            else
+            {
+                Console.WriteLine("Nothing to redo! ");
+            }
         }
 
         // TODO: Step 11 - Implement ShowStatistics method
@@ -212,6 +323,19 @@ namespace StackLab
             // - Total operations performed
             // - Whether stack is empty
             // - Current top action (if any)
+            Console.WriteLine($"Stack size: {actionHistory.Count}");
+            Console.WriteLine($"Undo size: {undoFunctionality.Count}");
+            Console.WriteLine($"Total Operations: {totalOperations}");
+            if (actionHistory.Count > 0)
+            {
+                Console.WriteLine("Stack is not empty");
+                Console.WriteLine($"Top of stack: {actionHistory.Peek()}");
+            }
+            else
+            {
+                Console.WriteLine("Stack is empty");
+            }
+
         }
 
         // TODO: Step 12 - Implement ShowSessionSummary method
@@ -224,6 +348,30 @@ namespace StackLab
             // - List remaining actions (if any)
             // - Encouraging message
             // - Wait for keypress before exit
+            Console.WriteLine($"Total operations: {totalOperations}");
+            Console.WriteLine($"Final stack size: {actionHistory.Count}");
+
+            if (actionHistory.Count > 0)
+            {
+                Console.WriteLine("--------------------------------------");
+                Console.WriteLine("STACK INSIDE");
+                Console.WriteLine("--------------------------------------");
+
+                int counter = 0;
+                foreach (string i in actionHistory)
+                {
+                    Console.Write($"{counter}. {i}");
+                    counter++;
+                    if (String.Equals(i, actionHistory.Peek()))
+                    {
+                        Console.Write(" <- TOP OF STACK");
+                    }
+                    Console.WriteLine();
+                }
+            }
+
+            Console.WriteLine("Thanks for playing!");
+            Console.ReadLine();
         }
     }
 }
