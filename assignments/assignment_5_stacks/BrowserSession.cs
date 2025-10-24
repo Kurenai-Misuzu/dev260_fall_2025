@@ -34,8 +34,20 @@ namespace Assignment5
         /// </summary>
         public void VisitUrl(string url, string title)
         {
-            // TODO: Implement navigation logic
-            throw new NotImplementedException("VisitUrl method needs to be implemented");
+            // if current page isn't null
+            if (currentPage != null)
+            {
+                // push current to backstack
+                backStack.Push(currentPage);
+            }
+            // clear forward stack
+            forwardStack.Clear();
+            // set new page as current
+            WebPage newPage = new WebPage(url, title);
+            currentPage = newPage;
+            // Console.WriteLine("WHAT IS THE CURRENT PAGE" + currentPage);
+
+            //throw new NotImplementedException("VisitUrl method needs to be implemented");
         }
 
         /// <summary>
@@ -47,8 +59,18 @@ namespace Assignment5
         /// </summary>
         public bool GoBack()
         {
-            // TODO: Implement back navigation
-            throw new NotImplementedException("GoBack method needs to be implemented");
+            // backstack is possible (can go back)
+            if (backStack.Count > 0 && currentPage != null)
+            {
+                // current page to forward stack
+                forwardStack.Push(currentPage);
+                // backstack to curernt page
+                currentPage = backStack.Pop();
+                return true;
+            }
+            // can't go back
+            return false;
+            //throw new NotImplementedException("GoBack method needs to be implemented");
         }
 
         /// <summary>
@@ -60,8 +82,19 @@ namespace Assignment5
         /// </summary>
         public bool GoForward()
         {
-            // TODO: Implement forward navigation
-            throw new NotImplementedException("GoForward method needs to be implemented");
+            // forwarding possible
+            if (forwardStack.Count > 0 && currentPage != null)
+            {
+                // current to back
+                backStack.Push(currentPage);
+                // front stack to current
+                currentPage = forwardStack.Pop();
+                return true;
+            }
+            // can't go front
+            return false;
+            
+            //throw new NotImplementedException("GoForward method needs to be implemented");
         }
 
         /// <summary>
@@ -79,7 +112,7 @@ namespace Assignment5
 
         /// <summary>
         /// Display back history (most recent first)
-        /// TODO: Implement this method
+        
         /// Expected output format:
         /// 📚 Back History (most recent first):
         ///    1. Google Search (https://www.google.com)
@@ -91,18 +124,35 @@ namespace Assignment5
         /// </summary>
         public void DisplayBackHistory()
         {
-            // TODO: Implement back history display
+
             // 1. Print header: "📚 Back History (most recent first):"
             // 2. Check if backStack.Count == 0, if so print "   (No back history)" and return
             // 3. Use foreach loop with backStack to display pages
             // 4. Show position number, page title, and URL for each page
             // 5. Format: "   {position}. {page.Title} ({page.Url})"
-            throw new NotImplementedException("DisplayBackHistory method needs to be implemented");
+
+            // print header
+            Console.WriteLine("📚 Back History (most recent first): ");
+            // backstack empty
+            if (backStack.Count < 1)
+            {
+                Console.WriteLine("   (No back history)");
+                return;
+            }
+            // not emptyu
+            int counter = 1;
+            // enumerate through stack
+            foreach (WebPage i in backStack)
+            {
+                Console.WriteLine($"{counter}. {i.Title} ({i.Url})");
+                counter++;
+            }
+
+            //throw new NotImplementedException("DisplayBackHistory method needs to be implemented");
         }
 
         /// <summary>
         /// Display forward history (next page first)
-        /// TODO: Implement this method
         /// Expected output format:
         /// 📖 Forward History (next page first):
         ///    1. Documentation Page (https://docs.microsoft.com)
@@ -113,18 +163,32 @@ namespace Assignment5
         /// </summary>
         public void DisplayForwardHistory()
         {
-            // TODO: Implement forward history display
             // 1. Print header: "📖 Forward History (next page first):"
             // 2. Check if forwardStack.Count == 0, if so print "   (No forward history)" and return
             // 3. Use foreach loop with forwardStack to display pages
             // 4. Show position number, page title, and URL for each page
             // 5. Format: "   {position}. {page.Title} ({page.Url})"
-            throw new NotImplementedException("DisplayForwardHistory method needs to be implemented");
+
+            // forward stack emptu
+            if (forwardStack.Count < 1)
+            {
+                Console.WriteLine("   (No forward history)");
+                return;
+            }
+            // not empty
+            int counter = 1;
+            // enumerate through stack
+            foreach (WebPage i in forwardStack)
+            {
+                Console.WriteLine($"{counter}. {i.Title} ({i.Url})");
+                counter++;
+            }
+
+            //throw new NotImplementedException("DisplayForwardHistory method needs to be implemented");
         }
 
         /// <summary>
         /// Clear all navigation history
-        /// TODO: Implement this method
         /// Expected behavior:
         /// - Count total pages to be cleared (backStack.Count + forwardStack.Count)
         /// - Clear both backStack and forwardStack
@@ -133,11 +197,19 @@ namespace Assignment5
         /// </summary>
         public void ClearHistory()
         {
-            // TODO: Implement clear history functionality
             // 1. Calculate total pages: int totalCleared = backStack.Count + forwardStack.Count;
             // 2. Clear both stacks: backStack.Clear() and forwardStack.Clear()
             // 3. Print confirmation message with count of cleared pages
-            throw new NotImplementedException("ClearHistory method needs to be implemented");
+
+            // calculate total pages
+            int totalPages = backStack.Count + forwardStack.Count;
+            // clear both
+            backStack.Clear();
+            forwardStack.Clear();
+            // print confirmation
+            Console.WriteLine($"✅ Cleared {totalPages} pages from navigation history.");
+
+            //throw new NotImplementedException("ClearHistory method needs to be implemented");
         }
     }
 }
