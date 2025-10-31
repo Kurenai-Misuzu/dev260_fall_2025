@@ -1,86 +1,90 @@
 # Assignment 6: Game Matchmaking System - Implementation Notes
 
-**Name:** [Your Name]
+**Name:** Dylan Verallo
 
 ## Multi-Queue Pattern Understanding
 
 **How the multi-queue pattern works for game matchmaking:**
-[Explain your understanding of how the three different queues (Casual, Ranked, QuickPlay) work together and why each has different matching strategies]
+the three different queues work together because each player will want a different experience when playing the game. When a player picks ranked, they want to play with someone close to their skill level. When a player picks casual, they don't care they just want to play. Quick play should be a decent mix between both of those experiences.
 
 ## Challenges and Solutions
 
 **Biggest challenge faced:**
-[Describe the most difficult part of the assignment - was it the skill-based matching, queue management, or match processing?]
+I think the biggest challenge of this assignment was the skill based matchmaking.
 
 **How you solved it:**
-[Explain your solution approach and what helped you figure it out]
+the hardest part for me was understanding how to search through the queue and get players without sorting the queue. I learned that I could make a temp list and use that as player 1 and have the queue be player 2. That way i can easily compare without having to have 2 indexes in the queue or sorting the queue.
 
 **Most confusing concept:**
-[What was hardest to understand about queues, matchmaking algorithms, or game mode differences?]
+I think the most confusing concept was understanding quickplay because it involved both raw matching and skill based matchmaking.
 
 ## Code Quality
 
 **What you're most proud of in your implementation:**
-[Highlight the best aspect of your code - maybe your skill matching logic, queue status display, or error handling]
+I'm most proud about implementing skill based matchmaking
 
 **What you would improve if you had more time:**
-[Identify areas for potential improvement - perhaps better algorithms, more features, or cleaner code structure]
+I'd like to have a bit of a more elegant solution when implementing skill based matchmaking. the method I used seems kind of like a hack.
 
 ## Testing Approach
 
 **How you tested your implementation:**
-[Describe your overall testing strategy - how did you verify skill-based matching worked correctly?]
+I made sure to pair up players of different skill levels and then players against players again when their skill levels changed after wins and losses.
 
 **Test scenarios you used:**
-[List specific scenarios you tested, like players with different skill levels, empty queues, etc.]
+- putting skill 1 and skill 3 in casual (matches)
+- putting skill 10 and skill 1 in casual (matches)
+- putting skill 10 and skill 8 in ranked (matches)
+- putting skill 10 and skill 1 in ranked (no match)
+- putting skill 10 and skill 1 in quickplay with 5 players in queue (match)
 
 **Issues you discovered during testing:**
-[Any bugs or problems you found and fixed during development]
+initially when i requeued a player they were still in queue because I forgot to use leavequeue so I had to slot that in somewhere
 
 ## Game Mode Understanding
 
 **Casual Mode matching strategy:**
-[Explain how you implemented FIFO matching for Casual mode]
+I just take the first 2 players in the Queue and set those as player 1 and player 2
 
 **Ranked Mode matching strategy:**
-[Explain how you implemented skill-based matching (±2 levels) for Ranked mode]
+i made a copy of the queue and turned it into a list. i would then make the list be player 1 then compare the skill rating of p1 to whoever is next in the queue that has a valid skill rating. Then whoever was valid would be p2. then they are both removed from the queue and placed into a match.
 
 **QuickPlay Mode matching strategy:**
-[Explain your approach to balancing speed vs. skill matching in QuickPlay mode]
+if less than 4 players in the queue, then i take the implementation from ranked mode and copy it over. if there are more than 4 players i take the implementation from casual mode and use that.
 
 ## Real-World Applications
 
 **How this relates to actual game matchmaking:**
-[Describe how your implementation connects to real games like League of Legends, Overwatch, etc.]
+you need skill based matchmaking in ranked modes in video games and in quick play you still want some sort of sbmm  but prioritize speed. in casual modes no one cares about skill level.
 
 **What you learned about game industry patterns:**
-[What insights did you gain about how online games handle player matching?]
+it's very important or your players can get frustrated.
 
 ## Stretch Features
 
-[If you implemented any extra credit features like team formation or advanced analytics, describe them here. If not, write "None implemented"]
+none implemented
 
 ## Time Spent
 
-**Total time:** [X hours]
+**Total time:** 4 hours
 
 **Breakdown:**
 
-- Understanding the assignment and queue concepts: [X hours]
-- Implementing the 6 core methods: [X hours]
-- Testing different game modes and scenarios: [X hours]
-- Debugging and fixing issues: [X hours]
-- Writing these notes: [X hours]
+- Understanding the assignment and queue concepts: 1.5 hrs
+- Implementing the 6 core methods: 2 hrs
+- Testing different game modes and scenarios: .25 hrs
+- Debugging and fixing issues: .25 hrs
+- Writing these notes: .05 hrs
 
-**Most time-consuming part:** [Which aspect took the longest and why - algorithm design, debugging, testing, etc.]
+**Most time-consuming part:** implenting sbmm and reading through all the classes to find out about each class's variables and methods
 
 ## Key Learning Outcomes
 
 **Queue concepts learned:**
-[What did you learn about managing multiple queues and different processing strategies?]
+managing multiple queues takes a lot of effort. I'd imagine in a big game studio it would take up a lot of resources
 
 **Algorithm design insights:**
-[What did you learn about designing matching algorithms and handling different requirements?]
+designing something similar but with slightly different requirements still takes a lot of time
 
 **Software engineering practices:**
-[What did you learn about error handling, user interfaces, and code organization?]
+I have much to learn

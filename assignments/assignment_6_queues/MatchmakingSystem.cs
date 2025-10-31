@@ -1,3 +1,8 @@
+using System.Collections;
+using System.Drawing;
+using System.Security;
+using System.Text.RegularExpressions;
+
 namespace Assignment6
 {
     /// <summary>
@@ -85,10 +90,30 @@ namespace Assignment6
         /// </summary>
         public void AddToQueue(Player player, GameMode mode)
         {
-            // TODO: Implement this method
-            // Hint: Use switch statement on mode to select correct queue
-            // Don't forget to call player.JoinQueue()!
-            throw new NotImplementedException("AddToQueue method not yet implemented");
+            
+            // player in queue already
+            if (!player.GetQueueTime().Equals("Not in queue"))
+            {
+                // throw error
+                throw new Exception("Player already in Queue!");
+            }
+
+            // enqueue player into the right mode
+            switch (mode)
+            {
+                case GameMode.Casual:
+                    casualQueue.Enqueue(player);
+                    break;
+                case GameMode.Ranked:
+                    rankedQueue.Enqueue(player);
+                    break;
+                default: // quickplay 
+                    quickPlayQueue.Enqueue(player);
+                    break;
+            }
+
+            // joinqueue
+            player.JoinQueue();
         }
 
         /// <summary>
@@ -104,10 +129,86 @@ namespace Assignment6
         /// </summary>
         public Match? TryCreateMatch(GameMode mode)
         {
-            // TODO: Implement this method
-            // Hint: Different logic needed for each mode
-            // Remember to check queue count first!
-            throw new NotImplementedException("TryCreateMatch method not yet implemented");
+            // if the mode has less than 2 players in queue return null immediately
+            if (GetQueueByMode(mode).Count < 2)
+            {
+                return null;
+            }
+
+            // some variables used for convenicne
+            Player? p1 = null;
+            Player? p2 = null;
+
+            // switch case for mode
+            switch (mode)
+            {
+                // casual
+                case GameMode.Casual:
+                    p1 = casualQueue.Dequeue();
+                    p2 = casualQueue.Dequeue();
+                    p1.LeaveQueue();
+                    p2.LeaveQueue();
+                    return new Match(p1, p2, mode);
+
+                // ranked
+                case GameMode.Ranked:
+                    // skill based matchmaking
+
+                    // templist to make looking up easier
+                    List<Player> tempList = rankedQueue.ToList();
+
+                    // nested foreach lol
+                    // goes thru the first list as p1 then compares it to the rank of p2 in the queue
+                    foreach (Player i in tempList)
+                    {
+                        foreach (Player j in rankedQueue)
+                        {
+                            // this will run if the usernames are not equal (self match) and canmatchinranked is true
+                            if (!j.Username.Equals(i.Username) && CanMatchInRanked(i, j))
+                            {
+                                RemoveFromAllQueues(i);
+                                RemoveFromAllQueues(j);
+                                return new Match(i, j, mode);
+                            }
+                        }
+                    }
+                    break;
+                
+                // quickplay
+                default:
+                    // prefer sbmm if less than 4 players
+                    if (quickPlayQueue.Count < 4)
+                    {
+                        // same code as ranked sbmm 
+                        List<Player> tempList2 = quickPlayQueue.ToList();
+
+                        foreach (Player i in tempList2)
+                        {
+                            foreach (Player j in quickPlayQueue)
+                            {
+                                if (!j.Username.Equals(i.Username) && CanMatchInRanked(i, j))
+                                {
+                                    RemoveFromAllQueues(i);
+                                    RemoveFromAllQueues(j);
+                                    return new Match(i, j, mode);
+                                }
+                            }
+                        }
+                    }
+                    // raw matching more than 4 players
+                    else
+                    {
+                        p1 = quickPlayQueue.Dequeue();
+                        p2 = quickPlayQueue.Dequeue();
+                        p1.LeaveQueue();
+                        p2.LeaveQueue();
+                        return new Match(p1, p2, mode);
+                    }
+
+                    break;
+            }
+
+            return null;
         }
 
         /// <summary>
@@ -121,9 +222,15 @@ namespace Assignment6
         /// </summary>
         public void ProcessMatch(Match match)
         {
-            // TODO: Implement this method
-            // Hint: Very straightforward - simulate, record, display
-            throw new NotImplementedException("ProcessMatch method not yet implemented");
+            // simulate outcome
+            match.SimulateOutcome();
+            // add to matchhistory
+            matchHistory.Add(match);
+            // increment matches
+            totalMatches++;
+            // print the matches played
+            Console.WriteLine($"{match.ToDetailedString()}");
+            
         }
 
         /// <summary>
@@ -139,9 +246,72 @@ namespace Assignment6
         /// </summary>
         public void DisplayQueueStatus()
         {
-            // TODO: Implement this method
-            // Hint: Loop through each queue and display formatted information
-            throw new NotImplementedException("DisplayQueueStatus method not yet implemented");
+            // header
+            Console.WriteLine("============================================================");
+            Console.WriteLine("Current Queue Status");
+            Console.WriteLine("============================================================");
+
+            // used to check if queue is empty and also for index printing
+            int queueCount = 0;
+
+            // casual queue
+            queueCount = casualQueue.Count;
+
+            // guard clause
+            if (queueCount < 1)
+            {
+                Console.WriteLine("Casual Queue is Empty!");
+            }
+            else
+            {
+                // set as index
+                queueCount = 0;
+                Console.WriteLine("Casual Queue:");
+                foreach (Player i in casualQueue)
+                {
+                    // increment index
+                    queueCount++;
+                    // print the player in the queue
+                    Console.WriteLine($"{queueCount}. {i.ToString()}");
+                }
+            }
+            
+            // comments are same for ranked and quickplay i will not be copying comments
+            Console.WriteLine("------------------------------------------------------------");
+            // rankd queue
+            queueCount = rankedQueue.Count;
+            if (queueCount < 1)
+            {
+                Console.WriteLine("Ranked Queue is Empty!");
+            }
+            else
+            {
+                queueCount = 0;
+                Console.WriteLine("Ranked Queue:");
+                foreach (Player i in rankedQueue)
+                {
+                    queueCount++;
+                    Console.WriteLine($"{queueCount}. {i.ToString()}");
+                }
+            }
+            Console.WriteLine("------------------------------------------------------------");
+            // quickplay queue
+            queueCount = quickPlayQueue.Count;
+            if (queueCount < 1)
+            {
+                Console.WriteLine("Quick Play Queue is Empty!");
+            }
+            else
+            {
+                queueCount = 0;
+                Console.WriteLine("Quick Play Queue:");
+                foreach (Player i in quickPlayQueue)
+                {
+                    queueCount++;
+                    Console.WriteLine($"{queueCount}. {i.ToString()}");
+                }
+            }
+            Console.WriteLine("------------------------------------------------------------");
         }
 
         /// <summary>
@@ -155,9 +325,27 @@ namespace Assignment6
         /// </summary>
         public void DisplayPlayerStats(Player player)
         {
-            // TODO: Implement this method
-            // Hint: Combine player info with match history filtering
-            throw new NotImplementedException("DisplayPlayerStats method not yet implemented");
+            // print player info
+            Console.WriteLine($"{player.ToDetailedString()}");
+            // print if player in queue
+            Console.WriteLine($"In Queue: {player.GetQueueTime()}");
+            
+            // match history
+            Console.WriteLine("Recent Matches:");
+            // total matches printed (max: 3)
+            int matchesPrinted = 0;
+            // make templist that is reversed match history 
+            List<Match> reversedHistory = matchHistory.AsEnumerable().Reverse().ToList();
+            // go thru reversed list
+            foreach (Match i in reversedHistory)
+            {
+                // will only run if less than 3 matches have already been printed and the player has been found in the matches
+                if (matchesPrinted < 3 && (player.Username.Equals(i.Player1.Username) || player.Username.Equals(i.Player2.Username)))
+                {
+                    Console.WriteLine($"{i.GetSummary()}");
+                    matchesPrinted++;
+                }
+            }
         }
 
         /// <summary>
@@ -171,9 +359,23 @@ namespace Assignment6
         /// </summary>
         public string GetQueueEstimate(GameMode mode)
         {
-            // TODO: Implement this method
-            // Hint: Check queue counts and apply mode-specific logic
-            throw new NotImplementedException("GetQueueEstimate method not yet implemented");
+            // get queue count of the chosen queue
+            int queueCount = 0;
+            Queue<Player> chosenQueue = GetQueueByMode(mode);
+            queueCount = chosenQueue.Count;
+
+            // if queue has more than 2 players
+            if (queueCount >= 2)
+            {
+                return "No Wait";
+            }
+            // if has 1 player
+            else if (queueCount == 1)
+            {
+                return "Short Wait";
+            }
+            // if no players
+            return "Long Wait";
         }
 
         // ============================================
