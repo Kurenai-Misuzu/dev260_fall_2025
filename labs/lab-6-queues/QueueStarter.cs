@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 /*
 === QUICK REFERENCE GUIDE ===
@@ -42,6 +43,10 @@ namespace QueueLab
     class Program
     {
         // TODO Step 1: Set up your data structures and tracking variables
+        private static Queue<SupportTicket> ticketQueue = new Queue<SupportTicket>();
+        private static int totalOperations = 0;
+        private static int ticketCounter = 0;
+        private static DateTime sessionStart = DateTime.Now;
 
         // Pre-defined ticket options for easy selection during demos
         private static readonly string[] CommonIssues = {
@@ -170,7 +175,7 @@ namespace QueueLab
                 Console.Write("Enter issue description: ");
                 description = Console.ReadLine()?.Trim() ?? "";
             }
-            
+
             // Input validation with multiple options - professional apps handle user choice
             if (string.IsNullOrWhiteSpace(description))
             {
@@ -183,6 +188,14 @@ namespace QueueLab
             // 3. Enqueue the ticket to ticketQueue
             // 4. Increment ticketCounter and totalOperations
             // 5. Show success message with ticket ID, description, and queue position
+            string newTicketID = "T" + ticketCounter.ToString("D3");
+            SupportTicket newTicket = new SupportTicket(newTicketID, description, "Normal", "User");
+            ticketQueue.Enqueue(newTicket);
+            ticketCounter++;
+            totalOperations++;
+            Console.WriteLine("Ticket Added to Queue!");
+
+            
         }
 
         // TODO Step 3: Handle processing tickets (Dequeue)
@@ -200,6 +213,25 @@ namespace QueueLab
             //    - Check if queue still has tickets after dequeue
             //    - If more tickets exist, show next ticket info using Peek()
             //    - If queue is now empty, show "all tickets processed" message
+            Console.WriteLine("---------------------------");
+            Console.WriteLine("Process next Ticket");
+            Console.WriteLine("---------------------------");
+
+            if (ticketQueue.Count < 1)
+            {
+                Console.WriteLine("No tickets to process");
+                return;
+            }
+            SupportTicket dequeuedTicket = ticketQueue.Dequeue();
+            totalOperations++;
+            Console.WriteLine("Processing Ticket: ");
+            Console.WriteLine($"{dequeuedTicket.ToDetailedString()}");
+            if (ticketQueue.Count < 1)
+            {
+                Console.WriteLine("All tickets processed");
+                return;
+            }
+            ticketQueue.Peek();
         }
 
         // TODO Step 4: Handle peeking at next ticket
@@ -215,6 +247,18 @@ namespace QueueLab
             //    - Show ticket details using ToDetailedString() method
             //    - Show position information (1 of X in queue)
             // 5. Remember: Peek doesn't modify the queue!
+            Console.WriteLine("---------------------------");
+            Console.WriteLine("View Next Ticket");
+            Console.WriteLine("---------------------------");
+            if (ticketQueue.Count < 1)
+            {
+                Console.WriteLine("No tickets to process");
+                return;
+            }
+            SupportTicket peekdTicket = ticketQueue.Peek();
+            Console.WriteLine("Next Ticket to be processed: ");
+            Console.WriteLine($"{peekdTicket.ToDetailedString()}");
+            Console.WriteLine($"(1 of {ticketQueue.Count} in Queue)");
         }
 
         // TODO Step 5: Handle displaying the full queue
@@ -231,6 +275,30 @@ namespace QueueLab
             //    - Use ToString() method on each ticket for display
             //    - Mark the first ticket with "← Next" to show it's next to be processed
             //    - Increment position counter for each ticket
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("Current Supoprt Queue (FIFO Order)");
+            Console.WriteLine("-----------------------------------------");
+            if (ticketQueue.Count < 1)
+            {
+                Console.WriteLine("Queue is empty - no tickets waiting");
+                return;
+            }
+            Console.WriteLine($"Tickets in Queue {ticketQueue.Count}");
+            int positionNumber = 1;
+            foreach (SupportTicket i in ticketQueue)
+            {
+
+                Console.Write($"{positionNumber}. {i.ToString()}");
+                if (positionNumber == 1)
+                {
+                    Console.WriteLine("← Next");
+                }
+                else
+                {
+                    Console.WriteLine();
+                }
+                positionNumber++;
+            }
         }
 
         // TODO Step 6: Handle clearing the queue
@@ -249,6 +317,27 @@ namespace QueueLab
             //      - Increment totalOperations
             //      - Show success message with count of cleared tickets
             //    - If response is anything else, show "Clear operation cancelled"
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("Clear All Tickets");
+            Console.WriteLine("-----------------------------------------");
+            if (ticketQueue.Count < 1)
+            {
+                Console.WriteLine("Queue is already empty. Nothing to clear");
+                return;
+            }
+            //todo
+            Console.WriteLine("This will remove X tickets. Are you sure? (y/N):");
+            string userInput = Console.ReadLine();
+            userInput = userInput.ToLower();
+            if (userInput == "y" || userInput == "yes")
+            {
+                int count = ticketQueue.Count;
+                ticketQueue.Clear();
+                totalOperations++;
+                Console.WriteLine($"Queue Cleared! Cleared Tickets: {count}");
+                return;
+            }
+            Console.WriteLine("Clear operation cancelled");
         }
 
         // TODO Step 7: Handle urgent ticket submission (Priority)
@@ -267,6 +356,28 @@ namespace QueueLab
             //    - Increment ticketCounter and totalOperations
             //    - Show success message with ticket ID and description
             //    - Add note explaining that real systems would jump to front of queue
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("Submit Urgent Ticket");
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("Urgent tickets are processed first!");
+
+            Console.WriteLine("Ticket Description: ");
+            string description = Console.ReadLine();
+
+            // Input validation with multiple options - professional apps handle user choice
+            if (string.IsNullOrWhiteSpace(description))
+            {
+                Console.WriteLine("❌ Description cannot be empty. Ticket submission cancelled.\n");
+                return;
+            }
+
+            string newTicketID = "U" + ticketCounter.ToString("D3");
+            SupportTicket newTicket = new SupportTicket(newTicketID, description, "Urgent", "User");
+            ticketQueue.Enqueue(newTicket);
+            ticketCounter++;
+            totalOperations++;
+            Console.WriteLine($"Ticket Added to Queue!: {newTicket.ToString()}");
+            Console.WriteLine("real systems would jump to front of queue");
         }
 
         // TODO Step 8: Handle searching for tickets
@@ -288,6 +399,38 @@ namespace QueueLab
             //      - If match found, display position and ticket info, set found flag
             //      - Increment position counter
             //    - After loop, if no matches found, show "No tickets found matching '[searchterm]'"
+            Console.WriteLine("-----------------------------------------");
+            Console.WriteLine("Search Tickets");
+            Console.WriteLine("-----------------------------------------");
+            if (ticketQueue.Count < 1)
+            {
+                Console.WriteLine("Queue is Empty. Nothing to search");
+                return;
+            }
+            Console.WriteLine("Enter ticket ID or description keyword");
+            string userInput = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(userInput))
+            {
+                Console.WriteLine("❌ Description cannot be empty. Ticket submission cancelled.\n");
+                return;
+            }
+            userInput = userInput.ToLower();
+            bool found = false;
+            int positionCounter = 1;
+            Console.WriteLine("SEARCH RESULTS");
+            foreach (SupportTicket i in ticketQueue)
+            { 
+                if (i.TicketId.ToLower().Contains(userInput) || i.Description.ToLower().Contains(userInput))
+                {
+                    found = true;
+                    Console.WriteLine("FOUND!");
+                    Console.WriteLine($"Position: {positionCounter}");
+                    Console.WriteLine($"Ticket Info: {i.ToString()}");
+                }
+                positionCounter++;
+            }
+            if (found) { return; }
+            Console.WriteLine($"No tickets found matching '[{userInput}]'");
         }
 
         static void HandleQueueStatistics()
