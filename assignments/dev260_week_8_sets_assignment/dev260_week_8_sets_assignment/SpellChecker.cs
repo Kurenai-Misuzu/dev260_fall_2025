@@ -83,8 +83,23 @@ namespace Assignment8
             // Hint: Use File.ReadAllLines() and handle FileNotFoundException
             // Hint: Use string.Trim() and string.ToLowerInvariant() for normalization
             // Hint: dictionary.Add() will automatically handle duplicates
+
+            try
+            {
+                string[] readLines = File.ReadAllLines(filename);  
+                var processedLines = readLines.Select(i => i.Trim().ToLowerInvariant());
+                dictionary.UnionWith(processedLines);
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("File Not Found!");
+                return false;
+            }
             
-            throw new NotImplementedException("LoadDictionary method not yet implemented");
+
+            
+            return true;
+            //throw new NotImplementedException("LoadDictionary method not yet implemented");
         }
         
         /// <summary>
@@ -112,8 +127,32 @@ namespace Assignment8
             // Hint: Split on char[] { ' ', '\t', '\n', '\r' } for simple tokenization
             // Hint: Use Regex.Replace to remove punctuation: @"[^\w\s]" -> ""
             // Hint: Filter out empty strings after processing
-            
-            throw new NotImplementedException("AnalyzeTextFile method not yet implemented");
+
+            allWordsInText.Clear();
+            uniqueWordsInText.Clear();
+
+            try
+            {
+                string readText = File.ReadAllText(filename);
+                char[] separators = { ' ', '\t', '\n', '\r' };
+                readText = Regex.Replace(readText, @"[^\w\s]", "");
+                string[] separatedText = readText.Split(separators, StringSplitOptions.RemoveEmptyEntries);
+                foreach ( string i in separatedText )
+                {
+                    allWordsInText.Add(i);
+                }
+                uniqueWordsInText.UnionWith(separatedText);
+                
+                currentFileName = filename;
+            }
+            catch (FileNotFoundException ex)
+            {
+                Console.WriteLine("File Not Found!");
+                return false;
+            }
+
+            return true;
+            // throw new NotImplementedException("AnalyzeTextFile method not yet implemented");
         }
         
         /// <summary>
@@ -137,8 +176,39 @@ namespace Assignment8
             // Hint: Clear both correctlySpelledWords and misspelledWords first
             // Hint: Use a foreach loop over uniqueWordsInText
             // Hint: Use dictionary.Contains(word) for fast lookup
+
+            // clear old results
+            correctlySpelledWords.Clear();
+            misspelledWords.Clear();
+
+            // iterate through uniquewords
+            foreach(string i in uniqueWordsInText)
+            {
+                if (dictionary.Contains(i))
+                {
+                    correctlySpelledWords.Add(i);    
+                } 
+                else
+                {
+                    misspelledWords.Add(i);
+                }
+            }
+
+            // int c = 1;
+            // foreach(string i in correctlySpelledWords)
+            // {
+            //     Console.WriteLine($"{c}: {i}");
+            //     c++;
+            // }
+
+            // c = 1;
+            // foreach(string i in misspelledWords)
+            // {
+            //     Console.WriteLine($"{c}: {i}");
+            //     c++;
+            // }
             
-            throw new NotImplementedException("CategorizeWords method not yet implemented");
+            //throw new NotImplementedException("CategorizeWords method not yet implemented");
         }
         
         /// <summary>
@@ -163,8 +233,21 @@ namespace Assignment8
             // Hint: Normalize the word using the same method as other operations
             // Hint: Use dictionary.Contains() and uniqueWordsInText.Contains()
             // Hint: Use allWordsInText.Count(w => w.Equals(normalizedWord, StringComparison.OrdinalIgnoreCase))
+            string wordReal = word;
+            wordReal = wordReal.Trim();
+            wordReal = wordReal.ToLowerInvariant();
+            wordReal = Regex.Replace(wordReal,  @"[^\w\s]", "");
+
+            bool inDictionary = dictionary.Contains(wordReal);
+            bool inText = allWordsInText.Contains(wordReal);
+            int occurrences = 0;
+            if (inText)
+            {
+                occurrences = allWordsInText.Count(w => w.Equals(wordReal, StringComparison.OrdinalIgnoreCase));
+            }
             
-            throw new NotImplementedException("CheckWord method not yet implemented");
+            return (inDictionary, inText, occurrences);
+            //throw new NotImplementedException("CheckWord method not yet implemented");
         }
         
         /// <summary>
@@ -188,8 +271,19 @@ namespace Assignment8
             // Hint: Convert misspelledWords to List, then use OrderBy()
             // Hint: Use Take(maxResults) to limit results if needed
             // Hint: Return empty list if no text has been analyzed
+
+            List<string> toReturn = new List<string>();
             
-            throw new NotImplementedException("GetMisspelledWords method not yet implemented");
+            if (currentFileName.CompareTo("") == 0)
+            {
+                return toReturn;
+            }
+            
+            toReturn = misspelledWords.ToList();
+            toReturn.Sort();
+            return toReturn;
+            
+            //throw new NotImplementedException("CheckWord method not yet implemented");
         }
         
         /// <summary>
@@ -212,8 +306,36 @@ namespace Assignment8
             // TODO: Implement unique words sample retrieval
             // Hint: Similar to GetMisspelledWords but use uniqueWordsInText
             // Hint: Consider showing a mix of correct and misspelled words
+
+            List<string> uniqueList = new List<string>();
             
-            throw new NotImplementedException("GetUniqueWordsSample method not yet implemented");
+            if (currentFileName.CompareTo("") == 0)
+            {
+                return uniqueList;
+            }
+
+            uniqueList = uniqueWordsInText.ToList();
+            uniqueList.Sort();
+
+            List<string> toReturn = new List<string>();
+            int count = 0;
+
+            foreach (string i in uniqueList)
+            {
+                if (count < 20)
+                {
+                    toReturn.Add(i);
+                } else
+                {
+                    break;
+                }
+                count++;
+            }
+
+            return toReturn;
+
+            
+            //throw new NotImplementedException("GetUniqueWordsSample method not yet implemented");
         }
         
         // Helper method for consistent word normalization
