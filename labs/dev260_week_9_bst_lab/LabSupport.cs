@@ -409,7 +409,7 @@ namespace Lab9_BST
 
             // INSTRUCTOR NOTE: Display session progress and system state information
             Console.WriteLine($"🎯 Total BST Operations: {stats.TotalOperations}");
-            Console.WriteLine($"⏱️ Lab Session Time: {stats.Uptime.ToString("hh\\\\:mm\\\\:ss")}");
+            Console.WriteLine($"⏱️ Lab Session Time: {stats.Uptime.ToString("hh\\:mm\\:ss")}");
             
             try
             {
