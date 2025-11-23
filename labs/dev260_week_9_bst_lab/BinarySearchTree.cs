@@ -278,6 +278,7 @@ namespace Lab9_BST
             {
                 node.Right = InsertRecursive(node.Right, employee);
             }
+            Console.WriteLine($"PARENT ONCE AGAIN: {node.ToString()}");
             // ignoring duplicates
             return node;
             //throw new NotImplementedException("InsertRecursive helper method needs implementation");
