@@ -13,168 +13,115 @@ _List your main entities with key fields, identifiers, and relationships (1–2 
 
 **Entity A:**
 
-- Name:
+- Name: Player
 - Key fields:
-- Identifiers:
-- Relationships:
-
-**Entity B (if applicable):**
-
-- Name:
-- Key fields:
-- Identifiers:
-- Relationships:
+    - Short name
+    - Long name
+    - jersey number
+- Identifiers: Long name (KEY)
+- Relationships: N/A
 
 **Identifiers (keys) and why they're chosen:**  
-_Explain your choice of keys (e.g., string Id, composite key, case-insensitive, etc.)._
-
-**Your Answer:**
+Long Name (full name) is the key in this program becuase 2 players might have the same jersey number or last name (short name). Long name was the closest thing I could have to a unique KEY for the user.
 
 ---
 
 ## Data Structures — Choices & Justification
-
-_List only the meaningful data structures you chose. For each, state the purpose, the role it plays in your app, why it fits, and alternatives considered._
-
 ### Structure #1
 
 **Chosen Data Structure:**  
-_Name the data structure (e.g., Dictionary<string, Customer>)._
-
-**Your Answer:**
+HashSet<Player> playerList;
 
 **Purpose / Role in App:**  
-_What user action or feature does it power?_
-
-**Your Answer:**
+This stores the available players and their stats. This is the main data structure of the program.
 
 **Why it fits:**  
-_Explain access patterns, typical size, performance/Big-O, memory, simplicity._
-
-**Your Answer:**
+it fits because we want automatic uniqueness with each element in the data structure. It is also O(1) to check if a player is in the data structure.
 
 **Alternatives considered:**  
-_List alternatives (e.g., List<T>, SortedDictionary, custom tree) and why you didn't choose them._
-
-**Your Answer:**
+List<Player>. I didn't choose it becuase I think it could be a little slower than a hashset and I think I have better use for List<Player> later. 
+BinarySearchTree<Player>. I didn't choose it becuase implementation would've taken more time. 
 
 ---
 
 ### Structure #2
 
 **Chosen Data Structure:**  
-_Name the data structure._
-
-**Your Answer:**
+List<Player> team1;
 
 **Purpose / Role in App:**  
-_What user action or feature does it power?_
-
-**Your Answer:**
+Holds the players in a team.
 
 **Why it fits:**  
-_Explain access patterns, typical size, performance/Big-O, memory, simplicity._
-
-**Your Answer:**
+It fits because I know there would've been a small amount of data and it would be easy to remove and delete data.
 
 **Alternatives considered:**  
-_List alternatives and why you didn't choose them._
-
-**Your Answer:**
+Stack<Player>. I think having index access is nice so I didn't choose stack.
+Player[]. I didn't choose an array because I wanted to be able to remove data easily.
 
 ---
 
 ### Structure #3
 
 **Chosen Data Structure:**  
-_Name the data structure._
-
-**Your Answer:**
+Queue<Player> statsQueue;
 
 **Purpose / Role in App:**  
-_What user action or feature does it power?_
-
-**Your Answer:**
+This is a queue of players so that their stats can be displayed on the stats screen of the broadcast.
 
 **Why it fits:**  
-_Explain access patterns, typical size, performance/Big-O, memory, simplicity._
-
-**Your Answer:**
+A queue fits because of it being FIFO. It's easy for data entry to add players in the order of display that they want.
 
 **Alternatives considered:**  
-_List alternatives and why you didn't choose them._
-
-**Your Answer:**
-
----
-
-### Additional Structures (if applicable)
-
-_Add more sections if you used additional structures like Queue for workflows, Stack for undo, HashSet for uniqueness, Graph for relationships, BST/SortedDictionary for ordered views, etc._
-
-**Your Answer:**
+None
 
 ---
 
 ## Comparers & String Handling
 
 **Comparer choices:**  
-_Explain what comparers you used and why (e.g., StringComparer.OrdinalIgnoreCase for keys)._
+StringComparer.IgnoreOrdinalCase was the main way strings were compared
 
-**Your Answer:**
-
-**For keys:**
-
-**For display sorting (if different):**
+I used long name (full name) as a key because some players might have the same jersey number or short name (last name)
 
 **Normalization rules:**  
-_Describe how you normalize strings (trim whitespace, collapse duplicates, canonicalize casing)._
-
-**Your Answer:**
+Trim whitespace then compare using IgnoreOrdinalCase
 
 **Bad key examples avoided:**  
-_List examples of bad key choices and why you avoided them (e.g., non-unique names, culture-varying text, trailing spaces, substrings that can change)._
+- Short name - Multiple players with the same last name might be playing.
+- Jersey number - Multiple players might have the same jersey number.
 
 ---
 
 ## Performance Considerations
 
 **Expected data scale:**  
-_Describe the expected size of your data (e.g., 100 items, 10,000 items)._
-
-**Your Answer:**
+Probably maybe less than 10000 would be my max
 
 **Performance bottlenecks identified:**  
-_List any potential performance issues and how you addressed them._
-
-**Your Answer:**
+None Applicable
 
 **Big-O analysis of core operations:**  
-_Provide time complexity for your main operations (Add, Search, List, Update, Delete)._
 
-**Your Answer:**
-
-- Add:
-- Search:
-- List:
-- Update:
-- Delete:
+- Add Player: O(1)
+- Remove Player: O(1) fastest, O(N) average
+- Display: O(N)
+- Add to team: O(N) average 
+- Remove from team: O(N) average
+- Print Team: O(N)
+- add to stats: O(1)
+- display stats: O(N)
 
 ---
 
 ## Design Tradeoffs & Decisions
 
 **Key design decisions:**  
-_Explain major design choices and why you made them._
-
-**Your Answer:**
+I had to create findplayer that used contains and get player that used a foreach. because i didn't know how to return an element in O(1) time.
 
 **Tradeoffs made:**  
-_Describe any tradeoffs between simplicity vs performance, memory vs speed, etc._
+None
 
-**Your Answer:**
 
 **What you would do differently with more time:**  
-_Reflect on what you might change or improve._
-
-**Your Answer:**
+Make it so that stats would update with scoreboard changes.
